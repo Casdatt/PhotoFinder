@@ -6,6 +6,8 @@ const limit = {
     LowX: 2.109694,
     HighX: 2.115305
 };
+const search = document.querySelector('#search')
+const challenge = document.querySelector('#challenge')
 const warngss = document.querySelector('#warngss');
 const warnff = document.querySelector('#warnff')
 const proceed = document.querySelector('#Proceed');
@@ -94,12 +96,14 @@ forfeit.onclick = function() {
 }
 
 search.onclick = () => {
+	search.style.color = "red"
 	CheckUbi(() => {
 		window.location.href = "Search.html";
 	});
 };
 
 challenge.onclick = () => {
+	challenge.style.color = "red"
 	CheckUbi(() => {
 		window.location.href = "challenge.html";
 	});
