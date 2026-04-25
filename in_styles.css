@@ -76,10 +76,22 @@ h1 {
   height: 30vh;
   width: 80vw;
 }
+
 p {
   margin-top: 4rem;
   margin-left: 4rem;
   margin-right: 4rem;
+}
+
+.errbox {
+  background-color: white;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  top: 0%;
+  width: 100vw;
+  height: 10vh;
 }
 
 .hidden {
