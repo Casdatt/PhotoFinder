@@ -1,25 +1,34 @@
-/* 41°23'16.6"N 2°06'34.9"E, y=41.38794 | x=2.109694; 
-   41°23'17.2"N 2°06'55.1"E; y=41.38811 | x=2.115305;*/
+/* y=41.387359790855136 | x=2.109694; 
+   y=41.3906296811951 | x=2.115305;*/
 const limit = {
-    LowY: 41.38794,
-    HighY: 41.38811,
+    LowY: 41.387359790855136,
+    HighY: 41.39062968119511,
     LowX: 2.109694,
     HighX: 2.115305
 };
+
+const guess = document.getElementById("guess");
+const forfeit = document.getElementById("forfeit");
+const proceed = document.getElementById("Proceed");
+const npcd = document.getElementById("Npcd")
+const nprd = document.getElementById("Nprd")
+
 const search = document.getElementById("search")
 const challenge = document.getElementById("challenge")
+
+
 const warngss = document.getElementById("warngss");
 const warnff = document.getElementById("warnff")
-const proceed = document.getElementById("Proceed");
+
 const results = document.getElementById("Result");
 const error = document.getElementById("errbox");
 const broke = document.getElementById("brokebox")
-const guess = document.getElementById("guess");
-const forfeit = document.getElementById("forfeit");
-const Takeph = document.getElementById("Takeph");
+
+const takeph = document.getElementById("Takeph");
 const inputCamara = document.getElementById("inputCamara");
+
 const Amcredits = 1;
-let Credits = credits();
+let Credits = credits(Amcredits);
 
 function EstimateDistance(lat1, lon1, lat2, lon2) {
 	const R = 6371e3; 											// Earth radius
@@ -52,76 +61,59 @@ const CheckUbi = function(ActIfInside) {
 	        X <= limit.HighX;
 
 		if (!Inside) {
+			console.log("Y, X", {Y, X});
 			error.classList.remove("hidden")
 			setTimeout(() => {
-	  	      error.classList.add("hidden");
+	  	    	error.classList.add("hidden");
 	   		}, 2000);
 		}
 		else {
 			ActIfInside();
 		}
+	});
+}
+if (document.getElementById("Pl")) {
+	search.onclick = function() {
+		CheckUbi(() => {
+			window.location.href = "Search.html";
+		});
+	};
+	challenge.onclick = function() {
+		CheckUbi(() => {
+			window.location.href = "challenge.html";
+		});
 	};
 }
 
-Takeph.onclick = () => {
-	if (Credits) {
-		CheckUbi(() => {
-			inputCamara.click();
+if (document.getElementById("Se")) {
+	guess.onclick = function() {
+		warngss.classList.remove("hidden");
+	}
+
+	forfeit.onclick = function() {
+		warnff.classList.remove("hidden")
+	}
+
+	proceed.onclick = function() {
+		navigator.geolocation.getCurrentPosition((position) => {
+			const userLat = position.coords.latitude;
+			const userLong = position.coords.longitude;
+			const distance = EstimateDistance(userLat, userLong, targetUbi.lat, targetUbi.lon);
+			const points = GainPoints(distance);
+			warngss.classList.add("hidden");
+			results.classList.remove("hidden");
+			const txtdis = document.querySelector('#txtdis');
+			const txtpnt = document.querySelector('#txtpnt');
+			txtdis.innerText = `You are ${distance.toFixed(2)} meters away` ;
+			txtpnt.innerText = `Points: ${points}`;
 		});
 	}
-	else {
-		broke.classList.remove("hidden")
-		setTimeout(() => {
-			broke.classList.add("hidden")
-		}, 2000);
+	npcd.onclick = function() {
+		warngss.classList.add("hidden")
 	}
-}
-
-inputCamara.onchange = function(e) {
-	const photo = e.target.files[0]
-	if (photo) {
-		const reader = new FileReader();
-		reader.onload = (event) => {
-		};
-		reader.readAsDataURL(photo);
+	nprd.onclick = function() {
+		warnff.classList.add("hidden")
 	}
-};
-
-guess.onclick = function() {
-	warngss.classList.remove("hidden");
-}
-
-forfeit.onclick = function() {
-	warnff.classList.remove("hidden")
-}
-
-search.onclick = function() {
-	search.style.color = "red"
-	CheckUbi(() => {
-		window.location.href = "Search.html";
-	});
-};
-
-challenge.onclick = function() {
-	challenge.style.color = "red"
-	CheckUbi(() => {
-		window.location.href = "challenge.html";
-	});
-};
-
-proceed.onclick = function() => {
-	navigator.geolocation.getCurrentPosition((position) => {
-		const userLat = position.coords.latitude;
-		const userLong = position.coords.longitude;
-		const distance = EstimateDistance(userLat, userLong, targetUbi.lat, targetUbi.lon);
-		const points = GainPoints(distance);
-		warngss.classList.add("hidden");
-		results.classList.remove("hidden");
-		const txtdis = document.querySelector('#txtdis');
-		const txtpnt = document.querySelector('#txtpnt');
-		txtdis.innerText = `You are ${distance.toFixed(2)} meters away` ;
-		txtpnt.innerText = `Points: ${points}`;
-	});
 }
 
 function credits(Amcredits) {
@@ -129,4 +121,31 @@ function credits(Amcredits) {
 		return true;
 	}
 	return false;
+}
+
+if (document.getElementById("Ch")) {
+	takeph.onclick = function() {
+		console.log({Credits, Amcredits})
+		if (Credits) {
+			CheckUbi(() => {
+				inputCamara.click();
+			});
+		}
+		else {
+			broke.classList.remove("hidden")
+			setTimeout(() => {
+				broke.classList.add("hidden")
+			}, 3000);
+		}
+	}
+
+	inputCamara.onchange = function(e) {
+		const photo = e.target.files[0]
+		if (photo) {
+			const reader = new FileReader();
+			reader.onload = (event) => {
+			};
+			reader.readAsDataURL(photo);
+		}
+	};
 }
