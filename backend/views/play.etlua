@@ -1,0 +1,15 @@
+
+<script src="static/ubi.js" type="module" defer></script>
+
+<div class="box">
+<h1 id="search">Search</h1>
+</div>
+
+<div class="box">
+<h1 id="challenge">Challenge</h1>
+</div>
+
+<div class="box">
+<a href="/"><h1>Back</h1></a>
+</div>
+

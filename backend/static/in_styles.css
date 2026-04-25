@@ -1,0 +1,87 @@
+html {
+  font-size: 10px;
+}
+
+body {
+  background-color: darkgreen;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+  display: block;
+  width: 100%;
+}
+
+.in {
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr;
+  height: 40vh;
+  gap: 6rem;
+  background-color: DarkGreen;
+  text-align: center;
+  justify-content: center;
+  flex-direction: center;
+  margin: 0 auto;
+  padding-top: 15rem;
+  padding-bottom: 15rem;
+}
+
+.box {
+  background-color: BlueViolet;
+  width: 80vw;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 1rem;
+  max-width: 50rem;
+  max-height: 10rem;
+}
+
+img {
+  justify-self: center;
+  height: 60vh;
+  width: auto;
+  grid-column: span 2;
+}
+
+h1 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 5vh;
+}
+
+.se {
+  display: grid;
+  grid-template-rows: 8fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
+  background-color: darkgreen;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.boxse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  justify-content: center;
+  align-items: center;
+  background-color: RebeccaPurple;
+  height: 30vh;
+  width: 80vw;
+}
+p {
+  margin-top: 4rem;
+  margin-left: 4rem;
+  margin-right: 4rem;
+}
+
+.hidden {
+  display: none !important;
+}
