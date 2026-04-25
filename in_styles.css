@@ -100,7 +100,7 @@ p {
 
 .boxnw {
   display: grid;
-  grid-template-columns: 1fr, 1fr;
+  grid-template-columns: 1fr 1fr;
   margin-top: 3rem;
   background-color: grey;
   align-items: center;
@@ -116,7 +116,7 @@ p {
   background-color: grey;
   display: grid;
   grid-template-columns: auto, 1fr;
-  grid-template-rows: 1fr, 1fr;
+  grid-template-rows: 1fr 1fr;
   align-items: center;
   text-align: center;
   max-height: 12rem;
