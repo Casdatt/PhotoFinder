@@ -151,13 +151,13 @@ if (document.getElementById("Ch")) {
 
         inputEl.onchange = function(e) {
             const photo = e.target.files[0];
-            CheckUbi()
+            CheckUbi(() => {
             console.log("cualquier cosa")
             if (photo && lastPosition) {
                 const form = new FormData();
                 form.append("image", photo);
-                form.append("lat", lasPosition.latitude);
-                form.append("lon", lasPosition.longitude);
+                form.append("lat", lastPosition.latitude);
+                form.append("lon", lastPosition.longitude);
 
                 fetch("/api/globo/upload", {
                     method: "POST",
@@ -184,9 +184,9 @@ if (document.getElementById("Ch")) {
                     Amcredits -= cost;
                 });
             }
-        };
-    }
-
+        });
+    };
+	}
     function startUnixTimer(container, creditLabel, endTime, imageEl, score) {
         const oldInfo = container.querySelector('.slot-info');
         if (oldInfo) oldInfo.remove();
@@ -200,7 +200,7 @@ if (document.getElementById("Ch")) {
             <div class="timer" style="color: white; font-family: monospace; font-size: 1.1rem;">Time left: --:--:--</div>
             <div class="stars-outer">
                 <div class="stars-inner" style="width: ${starPercentage}%"></div>
-            </div>html
+            </div>
             <div style="font-size: 0.8rem; color: white; margin-top: 2px;">Rating: ${score}</div>
         `;
         container.appendChild(infoDiv);
