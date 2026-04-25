@@ -1,8 +1,6 @@
 # PhotoFinder
 
 
-
-# PhotoFinder
 ## How to run
 This guide assumes you are using Ubuntu
 
