@@ -7,7 +7,6 @@ local db    = require("lapis.db")
 
 ---------
 
--- We declare the tables and insert some default data.
 ngx.timer.at(0, function(premature)
     if premature then return end
     db.query([[
@@ -53,7 +52,7 @@ ngx.timer.at(0, function(premature)
     for _, g in ipairs(seed_globos) do
         db.query([[
             INSERT INTO globos (user_id, image_path, lat, lon, lifetime)
-            VALUES (?, ?, ?, ?, INTERVAL 'infinity')
+            VALUES (?, ?, ?, ?, INTERVAL '9999999 hours')
             ON CONFLICT DO NOTHING
         ]], uid, g.path, g.lat, g.lon)
     end
@@ -113,31 +112,22 @@ app:get("/login", function(self)
   return { render = "login" }
 end)
 
---[[app:post("/login", function(self)
+app:post("/login", function(self)
     local username = self.params.username
     local password = self.params.password
 
-    -- Basic input validation
     if not username or not password or username == "" or password == "" then
-        return {
-            render = "login",
-            status = 400,
-            error  = "Username and password are required."
-        }
+        self.err  = "Username and password are required."
+        return {render = "login", status = 400}
     end
 
-    -- Look up user
     local user = db.select("* FROM users WHERE username = ?", username)[1]
 
     if not user or not verify_password(password, user.password_hash) then
-        return {
-            render = "login",
-            status = 401,
-            error  = "Invalid username or password."
-        }
+        self.err = "Invalid username or password."
+        return { render = "login", status = 401 }
     end
 
-    -- Generate token and set expiry (7 days)
     local token   = generate_token()
     local expires = db.raw("NOW() + INTERVAL '7 days'")
 
@@ -150,12 +140,68 @@ end)
     self.session.token = token
 
     return { redirect_to = "/" }
-end)]]
+end)
 
 
 app:get("/register", function(self)
   return { render = "register" }
 end)
+
+app:post("/register", function(self)
+local username = self.params.username
+    local password = self.params.password
+    local confirm  = self.params.confirm_password
+
+    -- Basic validation
+    if not username or username == "" then
+        self.err = "Username is required."
+        return { render = "register", status = 400, form_username = username }
+    end
+    if not password or password == "" then
+        self.err = "Password is required."
+        return { render = "register", status = 400 }
+    end
+    if password ~= confirm then
+        self.err = "Passwords do not match."
+        return { render = "register", status = 400 }
+    end
+    if #username < 3 or #username > 32 then
+        self.err = "Username must be between 3 and 32 characters."
+        return { render = "register", status = 400 }
+    end
+    if #password < 8 then
+        self. err = "Password must be at least 8 characters."
+        return { render = "register", status = 400 }
+    end
+
+    -- Check for existing user
+    local existing = db.select("id FROM users WHERE username = ?", username)[1]
+    if existing then
+        self.err = "Username already taken."
+        return { render = "register", status = 409 }
+    end
+
+    -- Hash and insert
+    local hash  = hash_password(password)
+    local token = generate_token()
+    local expires = db.raw("NOW() + INTERVAL '7 days'")
+
+    db.query(
+        "INSERT INTO users (username, password_hash, token, token_expires) VALUES (?, ?, ?, ?)",
+        username, hash, token, expires
+    )
+
+    -- Log them in immediately
+    self.session.token = token
+
+    return { redirect_to = "/" }
+end)
+
+app:get("/logout", function(self)
+    self.session.token = nil
+    return { redirect_to = "/" }
+end)
+
 
 app:get("/leaderboard", function(self)
   return { render = "leaderboard" }

@@ -1,9 +1,8 @@
 <div class="in" style="grid-template-rows: auto; height: auto;">
-
-    <% if error then %>
-        <p style="color: #ffcccc; margin: 0;"><%= error %></p>
+    
+    <% if err then %>
+        <p style="color: #ffcccc; margin: 0;"><%= err %></p>
     <% end %>
-
     <form method="POST" action="/login"
           style="display: flex; flex-direction: column; align-items: center; gap: 2rem; width: 100%;">
 
@@ -14,7 +13,7 @@
                 name="username"
                 autocomplete="username"
                 autofocus
-                value="<%= params.username or '' %>"
+                value="<%= username or '' %>"
                 style="font-size: 1.6rem; padding: 0.6rem 1.2rem; border: none;
                        border-radius: 0.5rem; width: 70%; background: #f0e6ff; color: #1a001a;"
             />
