@@ -3,7 +3,7 @@ html {
 }
 
 body {
-  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('images/HackUPCBckgrnd.jpg');
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('HackUPCBckgrnd.jpg');
   background-size: cover;
   background-position: center;
   width: 100%;
@@ -44,7 +44,7 @@ a {
   max-height: 10rem;
 }
 
-.tokai {
+.igm {
   justify-self: center;
   height: 60vh;
   width: auto;
@@ -102,19 +102,6 @@ p {
   display: none !important;
 }
 
-.boxnw {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  margin-top: 3rem;
-  background-color: grey;
-  align-items: center;
-  text-align: center;
-  max-height: 12rem;
-  width: 80vw;
-  height: auto;
-  border-radius: 2rem;
-}
-
 .boxch {
   margin-top: 3rem;
   background-color: grey;
@@ -153,6 +140,42 @@ p {
 .lgn {
   transform: translate(-2%, 20%);
 }
+
+.re {
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+}
 .boxre {
   background-color: #f0e6ff;
+}
+
+.slot-info {
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stars-outer {
+    display: inline-block;
+    position: relative;
+    font-size: 1.5rem;
+    color: #444; /* Color de estrellas vacías */
+}
+
+.stars-outer::before {
+    content: "★★★★★";
+}
+
+.stars-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 0; /* Esto cambiará con JS */
+    color: #f8ce0b; /* Color de estrellas rellenas */
+}
+
+.stars-inner::before {
+    content: "★★★★★";
 }
