@@ -14,8 +14,6 @@ const npcd = document.getElementById("Npcd")
 const nprd = document.getElementById("Nprd")
 
 const search = document.getElementById("search")
-const challenge = document.getElementById("challenge")
-
 
 const warngss = document.getElementById("warngss");
 const warnff = document.getElementById("warnff")
@@ -81,11 +79,6 @@ if (document.getElementById("Pl")) {
 	search.onclick = function() {
 		CheckUbi(() => {
 			window.location.href = "Search.html";
-		});
-	};
-	challenge.onclick = function() {
-		CheckUbi(() => {
-			window.location.href = "challenge.html";
 		});
 	};
 }
