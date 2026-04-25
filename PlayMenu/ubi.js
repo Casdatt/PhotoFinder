@@ -95,21 +95,21 @@ forfeit.onclick = function() {
 	warnff.classList.remove("hidden")
 }
 
-search.onclick = () => {
+search.onclick = function() => {
 	search.style.color = "red"
 	CheckUbi(() => {
 		window.location.href = "Search.html";
 	});
 };
 
-challenge.onclick = () => {
+challenge.onclick = function() => {
 	challenge.style.color = "red"
 	CheckUbi(() => {
 		window.location.href = "challenge.html";
 	});
 };
 
-proceed.onclick = () => {
+proceed.onclick = function() => {
 	navigator.geolocation.getCurrentPosition((position) => {
 		const userLat = position.coords.latitude;
 		const userLong = position.coords.longitude;
