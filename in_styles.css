@@ -149,3 +149,7 @@ p {
   display: flex;
   flex-direction: column;
 }
+
+.lgn {
+  transform: translate(-2%, 20%);
+}
