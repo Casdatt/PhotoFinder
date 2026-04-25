@@ -1,13 +1,13 @@
+<div class = "in">
+    <div class="box">
+        <a href="/play" style="color: white;"><h1>Play</h1></a>
+    </div>
 
-<div class="box">
-    <a href="play"><h1>Play</h1></a>
+    <div class="box">
+        <a href="/leaderBoard" style="color: white;"><h1>LeaderBoard</h1></a>
+    </div>
+
+    <div class="box">
+        <a href="/about" style="color: white;"><h1>About</h1></a>
+    </div>
 </div>
-
-<div class="box">
-    <a href="leaderBoard"><h1>LeaderBoard</h1></a>
-</div>
-
-<div class="box">
-    <a href="about"><h1>About</h1></a>
-</div>
-

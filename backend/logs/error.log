@@ -68,3 +68,14 @@
 2026/04/25 16:56:14 [alert] 375896#375896: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
 2026/04/25 17:21:33 [alert] 380333#380333: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
 2026/04/25 17:45:17 [alert] 383129#383129: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 19:00:27 [alert] 391947#391947: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 19:04:58 [alert] 392580#392580: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 19:07:06 [alert] 392915#392915: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 19:19:35 [alert] 394564#394564: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 19:21:33 [alert] 394797#394797: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 19:24:33 [alert] 395237#395237: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 19:30:24 [alert] 396377#396377: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 19:46:31 [alert] 398378#398378: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 19:47:20 [alert] 398519#398519: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 19:48:00 [alert] 398639#398639: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 19:52:39 [alert] 399149#399149: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20

@@ -28,7 +28,7 @@ ngx.timer.at(0, function(premature)
         image_path  TEXT         NOT NULL,
         lat         NUMERIC(12,8) NOT NULL,
         lon         NUMERIC(12,8) NOT NULL,
-        rating      NUMERIC(2,1) NOT NULL DEFAULT 0
+        rating      NUMERIC(2,1) NOT NULL DEFAULT 3
                                 CHECK (rating >= 0 AND rating <= 5
                                 AND rating * 2 = FLOOR(rating * 2)),
         created_at  TIMESTAMP   DEFAULT NOW(),
@@ -251,7 +251,7 @@ end)
 
 
 app:get("/api/globo/random", require_login(function(self)
-    local globo = db.select("* FROM globos WHERE expires_at > NOW() ORDER BY RANDOM() LIMIT 1")[1]
+    local globo = db.select("* FROM globos WHERE expires_at > NOW() AND user_id != ? ORDER BY RANDOM() LIMIT 1", self.current_user.id)[1]
 
     if not globo then
         return { json = { error = "No globos available" }, status = 404 }
@@ -272,7 +272,7 @@ app:post("/api/globo/upload", require_login(function(self)
     local file = self.params.image
     local lat  = tonumber(self.params.lat)
     local lon  = tonumber(self.params.lon)
-
+        
     if not file or not file.content or file.content == "" then
         return { json = { error = "Image is required." }, status = 400 }
     end
@@ -282,7 +282,7 @@ app:post("/api/globo/upload", require_login(function(self)
     if lat < -90 or lat > 90 or lon < -180 or lon > 180 then
         return { json = { error = "lat/lon out of range." }, status = 400 }
     end
-
+    
     local magic = file.content:sub(1, 12)
     local is_image = (
         magic:sub(1,3) == "\xFF\xD8\xFF"                              or
@@ -310,6 +310,16 @@ app:post("/api/globo/upload", require_login(function(self)
     end
 
     img:strip()
+
+    local w = img:get_width()
+    local h = img:get_height()
+    if w > h then
+        img:destroy()
+        return { json = { error = "Image must be portrait (taller than wide)." }, status = 400 }
+    end
+
+    local new_h = math.floor(h * 1080 / w)
+    img:resize(1080, new_h)
 
     local filename  = generate_token():sub(1, 24) .. ".webp"
     local save_path = "static/globos/" .. filename
@@ -343,6 +353,63 @@ app:post("/api/globo/upload", require_login(function(self)
     }, status = 201 }
 end))
 
+app:post("/api/globo/:id/rate", require_login(function(self)
+    local globo_id = tonumber(self.params.id)
+    local score    = tonumber(self.params.score)
+
+    if not globo_id then
+        return { json = { error = "Invalid globo id." }, status = 400 }
+    end
+    if not score or score < 0 or score > 5 or (score * 2) ~= math.floor(score * 2) then
+        return { json = { error = "Score must be 0–5 in 0.5 increments." }, status = 400 }
+    end
+
+    local globo = db.select("* FROM globos WHERE id = ? AND expires_at > NOW()", globo_id)[1]
+    if not globo then
+        return { json = { error = "Globo not found or expired." }, status = 404 }
+    end
+
+    db.query([[
+        INSERT INTO ratings (globo_id, user_id, score)
+        VALUES (?, ?, ?)
+        ON CONFLICT (globo_id, user_id) DO UPDATE SET score = EXCLUDED.score
+    ]], globo_id, self.current_user.id, score)
+
+    local avg_row = db.select("ROUND(AVG(score) * 2) / 2 AS avg_score FROM ratings WHERE globo_id = ?", globo_id)[1]
+    local avg = tonumber(avg_row.avg_score) or 0
+
+    if avg >= 4 and tonumber(globo.rating) < 4 then
+        db.query([[
+            UPDATE globos
+            SET rating   = ?,
+                lifetime = lifetime + INTERVAL '20 minutes'
+            WHERE id = ?
+        ]], avg, globo_id)
+    else
+        db.query("UPDATE globos SET rating = ? WHERE id = ?", avg, globo_id)
+    end
+
+    return { json = { globo_id = globo_id, new_rating = avg }, status = 200 }
+end))
+
+app:get("/api/globo/my", require_login(function(self)
+    local globos = db.select("* FROM globos WHERE user_id = ? ORDER BY created_at DESC", self.current_user.id)
+
+    local result = {}
+    for _, globo in ipairs(globos) do
+        table.insert(result, {
+            id         = globo.id,
+            image_path = globo.image_path,
+            lat        = globo.lat,
+            lon        = globo.lon,
+            rating     = globo.rating,
+            created_at = globo.created_at,
+            expires_at = globo.expires_at
+        })
+    end
+
+    return { json = result }
+end))
 
 
 app:get("/leaderboard", function(self)
@@ -364,7 +431,6 @@ end))
 app:get("/play", require_login(function(self)
   return { render = "play" }
 end))
-
 
 
 return app
