@@ -1,5 +1,5 @@
-/* y=41.387359790855136 | x=2.109694; 
-   y=41.3906296811951 | x=2.115305;*/
+/* 41°23'16.6"N 2°06'34.9"E, y=41.38794 | x=2.109694; 
+   41°23'17.2"N 2°06'55.1"E; y=41.38811 | x=2.115305;*/
 const limit = {
     LowY: 41.387359790855136,
     HighY: 41.39062968119511,
@@ -29,6 +29,8 @@ const inputCamara = document.getElementById("inputCamara");
 
 const Amcredits = 1;
 let Credits = credits(Amcredits);
+
+let targetUbi = { lat: 0, lon: 0 };
 
 function EstimateDistance(lat1, lon1, lat2, lon2) {
 	const R = 6371e3; 											// Earth radius
@@ -86,6 +88,23 @@ if (document.getElementById("Pl")) {
 }
 
 if (document.getElementById("Se")) {
+
+	fetch("/api/globo/random")
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error("Error de API:", data.error);
+            } else {
+                const imgElement = document.querySelector('.igm');
+                if (imgElement) {
+                    imgElement.src = data.image_path;
+                }
+                targetUbi.lat = data.lat;
+                targetUbi.lon = data.lon;
+            }
+        })
+        .catch(err => console.error("Error loading image:", err));
+
 	guess.onclick = function() {
 		warngss.classList.remove("hidden");
 	}
