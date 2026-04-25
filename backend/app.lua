@@ -2,6 +2,8 @@ local random = require("resty.random")
 local str    = require("resty.string")
 local bcrypt = require("bcrypt")
 
+local magick = require("magick")
+
 local lapis = require("lapis")
 local db    = require("lapis.db")
 
@@ -24,14 +26,27 @@ ngx.timer.at(0, function(premature)
         id          SERIAL PRIMARY KEY,
         user_id     INTEGER REFERENCES users(id),
         image_path  TEXT         NOT NULL,
-        lat         NUMERIC(9,6) NOT NULL,
-        lon         NUMERIC(9,6) NOT NULL,
+        lat         NUMERIC(12,8) NOT NULL,
+        lon         NUMERIC(12,8) NOT NULL,
         rating      NUMERIC(2,1) NOT NULL DEFAULT 0
                                 CHECK (rating >= 0 AND rating <= 5
                                 AND rating * 2 = FLOOR(rating * 2)),
         created_at  TIMESTAMP   DEFAULT NOW(),
         lifetime    INTERVAL    NOT NULL DEFAULT '2 hours',
         expires_at  TIMESTAMP   GENERATED ALWAYS AS (created_at + lifetime) STORED
+      )
+    ]])
+
+    db.query([[
+      CREATE TABLE IF NOT EXISTS ratings (
+        id         SERIAL    PRIMARY KEY,
+        globo_id   INTEGER   REFERENCES globos(id) ON DELETE CASCADE,
+        user_id    INTEGER   REFERENCES users(id),
+        score      NUMERIC(2,1) NOT NULL
+                             CHECK (score >= 0 AND score <= 5
+                             AND score * 2 = FLOOR(score * 2)),
+        created_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE (globo_id, user_id)
       )
     ]])
 
@@ -46,7 +61,10 @@ ngx.timer.at(0, function(premature)
     local uid = system_user.id
 
     local seed_globos = {
-        { path = "/static/globos/",    lat =  0, lon = 0  }
+        { path = "/static/globos/defaults/location1.webp",    lat =  41.3887952, lon = 2.1129702  },
+        { path = "/static/globos/defaults/location1.webp",    lat =  41.3880330, lon = 2.1117172  },
+        { path = "/static/globos/defaults/location1.webp",    lat =  41.3886677, lon = 2.1109759  },
+        { path = "/static/globos/defaults/location1.webp",    lat =  41.3881492, lon = 2.1139274  }
     }
 
     for _, g in ipairs(seed_globos) do
@@ -89,7 +107,22 @@ local function on_tick(premature)
     db.query("DELETE FROM globos WHERE expires_at < NOW()")
 
     if tick_count % 5 == 0 then
-        -- Add the erase uploaded images logic here.
+        local active = db.select("image_path FROM globos")
+        local active_set = {}
+        for _, row in ipairs(active) do
+            active_set[row.image_path] = true
+        end
+
+        local handle = io.popen("find static/globos -maxdepth 1 -type f")
+        if handle then
+            for filepath in handle:lines() do
+                local normalized = "/" .. filepath
+                if not active_set[normalized] then
+                    os.remove(filepath)
+                end
+            end
+            handle:close()
+        end
     end
     ngx.timer.at(360, on_tick)
 end
@@ -97,11 +130,24 @@ ngx.timer.at(0, on_tick)
 
 ---------
 
-
+local function require_login(fn)
+    return function(self)
+        local user = get_current_user(self)
+        if not user then
+            return { redirect_to = "/login" }
+        end
+        self.current_user = user
+        return fn(self)
+    end
+end
 
 local app = lapis.Application()
       app:enable("etlua")
       app.layout = require "views.layout"
+
+app:before_filter(function(self)
+    self.current_user = get_current_user(self)
+end)
 
 app:get("/", function(self)
   return { render = "index" }
@@ -111,6 +157,7 @@ end)
 app:get("/login", function(self)
   return { render = "login" }
 end)
+
 
 app:post("/login", function(self)
     local username = self.params.username
@@ -203,6 +250,101 @@ app:get("/logout", function(self)
 end)
 
 
+app:get("/api/globo/random", require_login(function(self)
+    local globo = db.select("* FROM globos WHERE expires_at > NOW() ORDER BY RANDOM() LIMIT 1")[1]
+
+    if not globo then
+        return { json = { error = "No globos available" }, status = 404 }
+    end
+
+    return { json = {
+        id         = globo.id,
+        image_path = globo.image_path,
+        lat        = globo.lat,
+        lon        = globo.lon,
+        rating     = globo.rating,
+        expires_at = globo.expires_at,
+        created_at = globo.created_at
+    }}
+end))
+
+app:post("/api/globo/upload", require_login(function(self)
+    local file = self.params.image
+    local lat  = tonumber(self.params.lat)
+    local lon  = tonumber(self.params.lon)
+
+    if not file or not file.content or file.content == "" then
+        return { json = { error = "Image is required." }, status = 400 }
+    end
+    if not lat or not lon then
+        return { json = { error = "lat and lon are required numeric values." }, status = 400 }
+    end
+    if lat < -90 or lat > 90 or lon < -180 or lon > 180 then
+        return { json = { error = "lat/lon out of range." }, status = 400 }
+    end
+
+    local magic = file.content:sub(1, 12)
+    local is_image = (
+        magic:sub(1,3) == "\xFF\xD8\xFF"                              or
+        magic:sub(1,8) == "\x89PNG\r\n\x1A\n"                        or
+        (magic:sub(1,4) == "RIFF" and magic:sub(9,12) == "WEBP")     or
+        magic:sub(1,4) == "GIF8"
+    )
+    if not is_image then
+        return { json = { error = "Unsupported image format." }, status = 415 }
+    end
+
+    local tmp_path = "/tmp/globo_" .. generate_token():sub(1, 16)
+    local tmp_file = io.open(tmp_path, "wb")
+    if not tmp_file then
+        return { json = { error = "Failed to create temp file." }, status = 500 }
+    end
+    tmp_file:write(file.content)
+    tmp_file:close()
+
+    local img, err = magick.load_image(tmp_path)
+    os.remove(tmp_path)
+
+    if not img then
+        return { json = { error = "Failed to load image: " .. (err or "unknown") }, status = 422 }
+    end
+
+    img:strip()
+
+    local filename  = generate_token():sub(1, 24) .. ".webp"
+    local save_path = "static/globos/" .. filename
+    local url_path  = "/static/globos/" .. filename
+
+    local ok, save_err = img:write(save_path)
+    img:destroy()
+
+    if not ok then
+        return { json = { error = "Failed to save image: " .. (save_err or "unknown") }, status = 500 }
+    end
+
+    local rows = db.query(
+        "INSERT INTO globos (user_id, image_path, lat, lon) VALUES (?, ?, ?, ?) RETURNING id, created_at, expires_at",
+        self.current_user.id, url_path, lat, lon
+    )
+
+    if not rows or #rows == 0 then
+        os.remove(save_path)
+        return { json = { error = "Failed to insert globo." }, status = 500 }
+    end
+
+    local globo = rows[1]
+    return { json = {
+        id         = globo.id,
+        image_path = url_path,
+        lat        = lat,
+        lon        = lon,
+        created_at = globo.created_at,
+        expires_at = globo.expires_at
+    }, status = 201 }
+end))
+
+
+
 app:get("/leaderboard", function(self)
   return { render = "leaderboard" }
 end)
@@ -211,12 +353,18 @@ app:get("/about", function(self)
   return { render = "about" }
 end)
     
-app:get("/search", function(self)
+app:get("/search", require_login(function(self)
   return { render = "search"}
-end)
+end))
 
-app:get("/play", function(self)
+app:get("/challenge", require_login(function(self)
+  return { render = "challenge"}
+end))
+
+app:get("/play", require_login(function(self)
   return { render = "play" }
-end)
+end))
+
+
 
 return app

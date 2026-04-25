@@ -58,3 +58,13 @@
 2026/04/25 15:18:44 [alert] 124249#124249: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
 2026/04/25 15:20:04 [alert] 129611#129611: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
 2026/04/25 15:22:40 [alert] 140850#140850: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 15:46:33 [alert] 237252#237252: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 15:50:04 [alert] 251536#251536: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 16:02:40 [alert] 302360#302360: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 16:06:39 [alert] 318413#318413: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 16:21:40 [alert] 370885#370885: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 16:47:55 [alert] 374826#374826: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 16:54:11 [alert] 375653#375653: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 16:56:14 [alert] 375896#375896: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 17:21:33 [alert] 380333#380333: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20
+2026/04/25 17:45:17 [alert] 383129#383129: lua_code_cache is off; this will hurt performance in /home/daniel/Desktop/backend/nginx.conf.compiled:20

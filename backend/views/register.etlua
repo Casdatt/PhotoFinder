@@ -1,6 +1,10 @@
+<div class="in" style="grid-template-rows: auto; height: auto;">
+
         <% if err then %>
           <p style="color: #ffcccc; margin: 0; font-size: 1.2rem;"><%= err %></p>
         <% end %>
+
+</div>
 
 <div class="boxse">
   <div class="se">

@@ -6,9 +6,20 @@ const limit = {
     LowX: 2.109694,
     HighX: 2.115305
 };
-const warngss = document.querySelector('#warngss');
-const proceed = document.querySelector('#Proceed');
-const results = document.querySelector('#Result');
+const search = document.getElementById("search")
+const challenge = document.getElementById("challenge")
+const warngss = document.getElementById("warngss");
+const warnff = document.getElementById("warnff")
+const proceed = document.getElementById("Proceed");
+const results = document.getElementById("Result");
+const error = document.getElementById("errbox");
+const broke = document.getElementById("brokebox")
+const guess = document.getElementById("guess");
+const forfeit = document.getElementById("forfeit");
+const Takeph = document.getElementById("Takeph");
+const inputCamara = document.getElementById("inputCamara");
+const Amcredits = 1;
+let Credits = credits();
 
 function EstimateDistance(lat1, lon1, lat2, lon2) {
 	const R = 6371e3; 											// Earth radius
@@ -22,17 +33,15 @@ function EstimateDistance(lat1, lon1, lat2, lon2) {
 }
 
 function GainPoints(distance) {
-	if (distance <= 4) return 1000;
-	if (distance <= 5) return 947;
-	if (distance <= 6) return 832;
-	if (distance <= 7) return 625;
-	if (distance <= 8) return 373;
-	if (distance <= 9) return 250;
-	if (distance <= 12) return 100;
+	if (distance <= 1) return 1000;
+	if (distance <= 2) return 947;
+	if (distance <= 3) return 632;
+	if (distance <= 4) return 425;
+	if (distance <= 5) return 173;
 	return 0;
 }
 
-const CheckUbi = function(ActIfInside){
+const CheckUbi = function(ActIfInside) {
 	navigator.geolocation.getCurrentPosition((position) => {
 	    const { latitude: Y, longitude: X } = position.coords;
 
@@ -42,36 +51,65 @@ const CheckUbi = function(ActIfInside){
 	        X >= limit.LowX && 
 	        X <= limit.HighX;
 
-	if (!Inside) {
-		error.classList.remove("hidden")
-		setTimeout(() => {
-	        error.classList.add("hidden");
-	    }, 2000);
+		if (!Inside) {
+			error.classList.remove("hidden")
+			setTimeout(() => {
+	  	      error.classList.add("hidden");
+	   		}, 2000);
+		}
+		else {
+			ActIfInside();
+		}
+	};
+}
+
+Takeph.onclick = () => {
+	if (Credits) {
+		CheckUbi(() => {
+			inputCamara.click();
+		});
 	}
 	else {
-		ActionIfInside();
+		broke.classList.remove("hidden")
+		setTimeout(() => {
+			broke.classList.add("hidden")
+		}, 2000);
+	}
+}
+
+inputCamara.onchange = function(e) {
+	const photo = e.target.files[0]
+	if (photo) {
+		const reader = new FileReader();
+		reader.onload = (event) => {
+		};
+		reader.readAsDataURL(photo);
 	}
 };
-
-
 
 guess.onclick = function() {
 	warngss.classList.remove("hidden");
 }
 
-search.onclick = () => {
+forfeit.onclick = function() {
+	warnff.classList.remove("hidden")
+}
+
+search.onclick = function() {
+	search.style.color = "red"
 	CheckUbi(() => {
 		window.location.href = "Search.html";
 	});
 };
 
-challenge.onclick = () => {
+challenge.onclick = function() {
+	challenge.style.color = "red"
 	CheckUbi(() => {
 		window.location.href = "challenge.html";
 	});
 };
 
-proceed.onclick = () => {
+proceed.onclick = function() => {
 	navigator.geolocation.getCurrentPosition((position) => {
 		const userLat = position.coords.latitude;
 		const userLong = position.coords.longitude;
@@ -81,7 +119,14 @@ proceed.onclick = () => {
 		results.classList.remove("hidden");
 		const txtdis = document.querySelector('#txtdis');
 		const txtpnt = document.querySelector('#txtpnt');
-		txtdis.innerText = `You are ${distance} meters away` ;
+		txtdis.innerText = `You are ${distance.toFixed(2)} meters away` ;
 		txtpnt.innerText = `Points: ${points}`;
 	});
+}
+
+function credits(Amcredits) {
+	if (Amcredits > 0) {
+		return true;
+	}
+	return false;
 }
