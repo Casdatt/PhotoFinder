@@ -133,15 +133,16 @@ if (document.getElementById("Se")) {
 }
 
 if (document.getElementById("Ch")) {
-    const slots = [
+	const slots = [
         { btn: document.getElementById("Takeph"), input: document.getElementById("inputCamara"), cost: 2 },
         { btn: document.getElementById("Takeph2"), input: document.getElementById("inputCamara2"), cost: 4 },
         { btn: document.getElementById("Takeph3"), input: document.getElementById("inputCamara3"), cost: 7 }
     ];
 
     function setupPhotoHandler(buttonEl, inputEl, cost) {
-        console.log("hii")
-        console.log({buttonEl, inputEl, cost});
+        // Aquí están vuestros logs para confirmar que funciona
+        console.log("Configurando botón para:", cost, "créditos");
+        
         buttonEl.onclick = function() {
             if (Amcredits >= cost) {
                 CheckUbi(() => inputEl.click());
@@ -153,32 +154,42 @@ if (document.getElementById("Ch")) {
 
         inputEl.onchange = function(e) {
             const photo = e.target.files[0];
-            if (!photo || !lastPosition) return;
+            if (!photo) return; // Si cancela la cámara, no hacemos nada
 
-            const form = new FormData();
-            form.append("image", photo);
-            form.append("lat", lastPosition.latitude);
-            form.append("lon", lastPosition.longitude);
+            // Envolvemos TODO en CheckUbi para tener el GPS fresco
+            CheckUbi(() => {
+                if (lastPosition) {
+                    console.log("Subiendo foto con coordenadas:", lastPosition);
+                    const form = new FormData();
+                    form.append("image", photo);
+                    form.append("lat", lastPosition.latitude);
+                    form.append("lon", lastPosition.longitude);
 
-            fetch("/api/globo/upload", {
-                method: "POST",
-                credentials: "include",
-                body: form
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) return console.error(data.error);
+                    fetch("/api/globo/upload", {
+                        method: "POST",
+                        credentials: "include",
+                        body: form
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) return console.error(data.error);
 
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    buttonEl.src = event.target.result;
-                    const creditLabel = buttonEl.parentElement.querySelector('h1');
-                    if (creditLabel) creditLabel.style.visibility = 'hidden';
-                    const endTime = new Date(data.expires_at).getTime();
-                    startUnixTimer(buttonEl.parentElement, creditLabel, endTime, buttonEl, 0);
-                };
-                reader.readAsDataURL(photo);
-                Amcredits -= cost;
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            buttonEl.src = event.target.result;
+                            const creditLabel = buttonEl.parentElement.querySelector('h1');
+                            if (creditLabel) creditLabel.style.visibility = 'hidden';
+                            
+                            // Usamos el expires_at que devuelve la API
+                            const endTime = new Date(data.expires_at).getTime();
+                            
+                            startUnixTimer(buttonEl.parentElement, creditLabel, endTime, buttonEl, data.rating || 0);
+                        };
+                        reader.readAsDataURL(photo);
+                        Amcredits -= cost;
+                    })
+                    .catch(err => console.error("Error subiendo foto:", err));
+                }
             });
         };
     }
@@ -225,49 +236,6 @@ if (document.getElementById("Ch")) {
         }, 500);
     }
 
-    slots.forEach(slot => setupPhotoHandler(slot.btn, slot.input, slot.cost));
-}
-    function startUnixTimer(container, creditLabel, endTime, imageEl, score) {
-        const oldInfo = container.querySelector('.slot-info');
-        if (oldInfo) oldInfo.remove();
-
-        const infoDiv = document.createElement('div');
-        infoDiv.className = 'slot-info';
-        
-        const starPercentage = (parseFloat(score) / 5) * 100;
-
-        infoDiv.innerHTML = `
-            <div class="timer" style="color: white; font-family: monospace; font-size: 1.1rem;">Time left: --:--:--</div>
-            <div class="stars-outer">
-                <div class="stars-inner" style="width: ${starPercentage}%"></div>
-            </div>
-            <div style="font-size: 0.8rem; color: white; margin-top: 2px;">Rating: ${score}</div>
-        `;
-        container.appendChild(infoDiv);
-
-        const timerDisplay = infoDiv.querySelector('.timer');
-
-        const interval = setInterval(() => {
-            const now = Date.now();
-            const timeLeftMs = endTime - now;
-
-            if (timeLeftMs <= 0) {
-                clearInterval(interval);
-                timerDisplay.innerText = "Time left: 00:00:00";
-                setTimeout(() => {
-                    infoDiv.remove();
-                    imageEl.src = "add.png";
-                    creditLabel.style.visibility = 'visible';
-                }, 1000);
-            } else {
-                const totalSeconds = Math.floor(timeLeftMs / 1000);
-                const hrs = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
-                const mins = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
-                const secs = (totalSeconds % 60).toString().padStart(2, '0');
-                timerDisplay.innerText = `Time left: ${hrs}:${mins}:${secs}`;
-            }
-        }, 500);
-    }
-
+    // Inicializamos los botones
     slots.forEach(slot => setupPhotoHandler(slot.btn, slot.input, slot.cost));
 }
