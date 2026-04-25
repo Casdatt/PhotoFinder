@@ -20,7 +20,7 @@ a {
   gap: 6rem;
   background-color: DarkGreen;
   text-align: center;
-	justify-content: center;
+  justify-content: center;
   flex-direction: center;
   margin: 0 auto;
   padding-top: 15rem;
@@ -48,8 +48,7 @@ img {
   grid-column: span 2;
 }
 
-h2 {
-  font-size: 1rem;
+h1 {
   display: flex;
   justify-content: center;
   align-items: center;
