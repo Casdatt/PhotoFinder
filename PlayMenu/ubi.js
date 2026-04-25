@@ -25,10 +25,13 @@ const error = document.getElementById("errbox");
 const broke = document.getElementById("brokebox")
 
 const takeph = document.getElementById("Takeph");
+const takeph2 = document.getElementById("Takeph2");
+const takeph3 = document.getElementById("Takeph3");
 const inputCamara = document.getElementById("inputCamara");
+const inputCamara2 = document.getElementById("inputCamara2");
+const inputCamara3 = document.getElementById("inputCamara3");
 
-const Amcredits = 1;
-let Credits = credits(Amcredits);
+let Amcredits = 10;
 
 let targetUbi = { lat: 0, lon: 0 };
 
@@ -135,36 +138,90 @@ if (document.getElementById("Se")) {
 	}
 }
 
-function credits(Amcredits) {
-	if (Amcredits > 0) {
-		return true;
-	}
-	return false;
-}
-
 if (document.getElementById("Ch")) {
-	takeph.onclick = function() {
-		console.log({Credits, Amcredits})
-		if (Credits) {
-			CheckUbi(() => {
-				inputCamara.click();
-			});
-		}
-		else {
-			broke.classList.remove("hidden")
-			setTimeout(() => {
-				broke.classList.add("hidden")
-			}, 3000);
-		}
-	}
+    const slots = [
+        { btn: document.getElementById("Takeph"), input: document.getElementById("inputCamara"), cost: 2 },
+        { btn: document.getElementById("Takeph2"), input: document.getElementById("inputCamara2"), cost: 4 },
+        { btn: document.getElementById("Takeph3"), input: document.getElementById("inputCamara3"), cost: 7 }
+    ];
 
-	inputCamara.onchange = function(e) {
-		const photo = e.target.files[0]
-		if (photo) {
-			const reader = new FileReader();
-			reader.onload = (event) => {
-			};
-			reader.readAsDataURL(photo);
-		}
-	};
+    function setupPhotoHandler(buttonEl, inputEl, cost) {
+        buttonEl.onclick = function() {
+            if (Amcredits >= cost) {
+                CheckUbi(() => inputEl.click());
+            } else {
+                broke.classList.remove("hidden");
+                setTimeout(() => broke.classList.add("hidden"), 3000);
+            }
+        };
+
+        inputEl.onchange = function(e) {
+            const photo = e.target.files[0];
+            if (photo) {
+                fetch("/api/globo/random")
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) return console.error(data.error);
+
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            buttonEl.src = event.target.result;
+                            const creditLabel = buttonEl.parentElement.querySelector('h1');
+                            if (creditLabel) creditLabel.style.visibility = 'hidden';
+
+                            const durationSeconds = 7200;
+                            const endTime = Date.now() + (durationSeconds * 1000);
+                            
+                            startUnixTimer(buttonEl.parentElement, creditLabel, endTime, buttonEl, data.rating);
+                        };
+                        reader.readAsDataURL(photo);
+                        Amcredits -= cost;
+                    });
+            }
+        };
+    }
+
+    function startUnixTimer(container, creditLabel, endTime, imageEl, score) {
+        const oldInfo = container.querySelector('.slot-info');
+        if (oldInfo) oldInfo.remove();
+
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'slot-info';
+        
+        const starPercentage = (parseFloat(score) / 5) * 100;
+
+        infoDiv.innerHTML = `
+            <div class="timer" style="color: yellow; font-family: monospace; font-size: 1.1rem;">Time left: --:--:--</div>
+            <div class="stars-outer">
+                <div class="stars-inner" style="width: ${starPercentage}%"></div>
+            </div>
+            <div style="font-size: 0.8rem; color: white; margin-top: 2px;">Rating: ${score}</div>
+        `;
+        container.appendChild(infoDiv);
+
+        const timerDisplay = infoDiv.querySelector('.timer');
+
+        const interval = setInterval(() => {
+            const now = Date.now();
+            const timeLeftMs = endTime - now;
+
+            if (timeLeftMs <= 0) {
+                clearInterval(interval);
+                timerDisplay.innerText = "Time left: 00:00:00";
+                setTimeout(() => {
+                    infoDiv.remove();
+                    imageEl.src = "add.png";
+                    creditLabel.style.visibility = 'visible';
+                }, 1000);
+            } else {
+                const totalSeconds = Math.floor(timeLeftMs / 1000);
+                const hrs = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+                const mins = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+                const secs = (totalSeconds % 60).toString().padStart(2, '0');
+                timerDisplay.innerText = `Time left: ${hrs}:${mins}:${secs}`;
+            }
+        }, 500);
+    }
+
+    slots.forEach(slot => setupPhotoHandler(slot.btn, slot.input, slot.cost));
 }
