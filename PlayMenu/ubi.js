@@ -6,18 +6,18 @@ const limit = {
     LowX: 2.109694,
     HighX: 2.115305
 };
-const search = document.querySelector('#search')
-const challenge = document.querySelector('#challenge')
-const warngss = document.querySelector('#warngss');
-const warnff = document.querySelector('#warnff')
-const proceed = document.querySelector('#Proceed');
-const results = document.querySelector('#Result');
-const error = document.querySelector('#errbox');
-const broke = document.querySelector('#brokebox')
-const guess = document.querySelector('#guess');
-const forfeit = document.querySelector('#forfeit');
-const Takeph = document.querySelector('#Takeph');
-const inputCamara = document.querySelector('#inputCamara');
+const search = document.getElementById("search")
+const challenge = document.getElementById("challenge")
+const warngss = document.getElementById("warngss");
+const warnff = document.getElementById("warnff")
+const proceed = document.getElementById("Proceed");
+const results = document.getElementById("Result");
+const error = document.getElementById("errbox");
+const broke = document.getElementById("brokebox")
+const guess = document.getElementById("guess");
+const forfeit = document.getElementById("forfeit");
+const Takeph = document.getElementById("Takeph");
+const inputCamara = document.getElementById("inputCamara");
 const Amcredits = 1;
 let Credits = credits();
 
@@ -95,14 +95,14 @@ forfeit.onclick = function() {
 	warnff.classList.remove("hidden")
 }
 
-search.onclick = function() => {
+search.onclick = function() {
 	search.style.color = "red"
 	CheckUbi(() => {
 		window.location.href = "Search.html";
 	});
 };
 
-challenge.onclick = function() => {
+challenge.onclick = function() {
 	challenge.style.color = "red"
 	CheckUbi(() => {
 		window.location.href = "challenge.html";
