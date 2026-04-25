@@ -159,7 +159,7 @@ p {
     display: inline-block;
     position: relative;
     font-size: 1.5rem;
-    color: #444; /* Color de estrellas vacías */
+    color: #444;
 }
 
 .stars-outer::before {
@@ -172,8 +172,8 @@ p {
     left: 0;
     white-space: nowrap;
     overflow: hidden;
-    width: 0; /* Esto cambiará con JS */
-    color: #f8ce0b; /* Color de estrellas rellenas */
+    width: 0;
+    color: #f8ce0b;
 }
 
 .stars-inner::before {
