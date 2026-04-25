@@ -7,8 +7,13 @@ const limit = {
     HighX: 2.115305
 };
 const warngss = document.querySelector('#warngss');
+const warnff = document.querySelector('#warnff')
 const proceed = document.querySelector('#Proceed');
 const results = document.querySelector('#Result');
+const error = document.querySelector('#errbox');
+const guess = document.querySelector('#guess');
+const forfeit = document.querySelector('#forfeit');
+
 
 function EstimateDistance(lat1, lon1, lat2, lon2) {
 	const R = 6371e3; 											// Earth radius
@@ -57,6 +62,10 @@ const CheckUbi = function(ActIfInside){
 
 guess.onclick = function() {
 	warngss.classList.remove("hidden");
+}
+
+forfeit.onclick = function() {
+	warnff.classList.remove("hidden")
 }
 
 search.onclick = () => {
