@@ -1,0 +1,9 @@
+<div class = "in">
+    <div class="box">
+        <a href="/play" style="color: white;"><h1>Play</h1></a>
+    </div>
+
+    <div class="box">
+        <a href="/about" style="color: white;"><h1>About</h1></a>
+    </div>
+</div>

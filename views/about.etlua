@@ -1,0 +1,22 @@
+<div class="boxse" style="transform: translateX(-50%); left: 50%; top: 10%; position: fixed; height: auto; border-radius: 3rem; padding: 3rem;">
+  <div class="se" style="transform: none; grid-template-columns: 1fr; grid-template-rows: auto; gap: 2rem;">
+    <h1 style="font-size: 3rem; text-align: center; color: white;">About</h1>
+    <p style="margin: 0; font-size: 2rem; color:white;">
+      Go to <strong>Search</strong> and you will receive a photo taken somewhere nearby.
+      Your goal is to physically find the location where that photo was taken.
+      The closer you get, the more credits you earn.
+    </p>
+
+    <p style="margin: 0; font-size: 2rem; color:white;">
+      Credits let you upload your own photos for other players to find.
+      The better rated your photo, the longer it stays alive.
+    </p>
+
+    <p style="margin: 0; font-size: 2rem; color:white;">
+      Built with: <a href="https://openresty.org" style="color: #d0b0ff;">OpenResty</a> (BSD), <a href="https://leafo.net/lapis/" style="color: #d0b0ff;">Lapis</a> (MIT), and <a href="https://github.com/mikejsavage/lua-bcrypt" style="color: #d0b0ff;">lua-bcrypt</a> (ISC).
+    </p>
+
+    <a href="/" style="color: white; text-align: center; font-size: 1.4rem;">Back</a>
+
+  </div>
+</div>
