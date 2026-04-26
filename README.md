@@ -35,7 +35,7 @@ sudo systemctl start postgresql
 psql postgres -c "CREATE DATABASE photofind;"
 ```
 
-Then update your `config.lua` with the database name, user, and password if needed.
+Then update your `config.lua` with the database name, user, and password.
 
 ### 6. Run the app
 ```
