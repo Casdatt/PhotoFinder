@@ -12,7 +12,7 @@ config("development", {
   postgres = {
   host     = "127.0.0.1",
     user = "admin",
-    password = "uzb)hrz64gcZk^B[",
+    password = "INSERT_YOUR_PASSWORD_HERE",
     database = "server_database"
     }
 })
